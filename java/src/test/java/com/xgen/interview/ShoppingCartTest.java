@@ -1,75 +1,133 @@
 package com.xgen.interview;
 
-import com.xgen.interview.Pricer;
-import com.xgen.interview.ShoppingCart;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 
 public class ShoppingCartTest {
 
+    IPrinter printer;
+    Pricer pricer;
+    ShoppingCart cart;
+    ByteArrayOutputStream output;
+
+    @Before
+    public void setup() {
+        printer = new DefaultPrinter();
+        pricer = new Pricer();
+        cart = new ShoppingCart(printer, pricer);
+        output = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(output));
+    }
+
+
     @Test
-    public void canAddAnItem() {
-        ShoppingCart sc = new ShoppingCart(new Pricer());
-
-        sc.addItem("apple", 1);
-
-        final ByteArrayOutputStream myOut = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(myOut));
-
-        sc.printReceipt();
-        assertEquals(String.format("apple - 1 - €1.00%n"), myOut.toString());
+    public void validConstructor() {
+        assertThrows(IllegalArgumentException.class, () -> new ShoppingCart(printer, null));
+        assertThrows(IllegalArgumentException.class, () -> new ShoppingCart(null, pricer));
     }
 
     @Test
-    public void canAddMoreThanOneItem() {
-        ShoppingCart sc = new ShoppingCart(new Pricer());
+    public void testOneItem() {
+        var actual = List.of(
+                new ShoppingItem("banana", 2)
+        );
 
-        sc.addItem("apple", 2);
+        cart.addItem("banana", 2);
 
-        final ByteArrayOutputStream myOut = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(myOut));
-
-        sc.printReceipt();
-        assertEquals(String.format("apple - 2 - €2.00%n"), myOut.toString());
+        assertEquals(cart.toList(), actual);
     }
 
     @Test
-    public void canAddDifferentItems() {
-        ShoppingCart sc = new ShoppingCart(new Pricer());
-
-        sc.addItem("apple", 2);
-        sc.addItem("banana", 1);
-
-        final ByteArrayOutputStream myOut = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(myOut));
-
-        sc.printReceipt();
-
-        String result = myOut.toString();
-
-        if (result.startsWith("apple")) {
-            assertEquals(String.format("apple - 2 - €2.00%nbanana - 1 - €2.00%n"), result);
-        } else {
-            assertEquals(String.format("banana - 1 - €2.00%napple - 2 - €2.00%n"), result);
-        }
+    public void testIllegalItem() {
+        assertThrows(IllegalArgumentException.class, () -> cart.addItem(null, 5));
+        assertThrows(IllegalArgumentException.class, () -> cart.addItem("banana", -2));
     }
 
     @Test
-    public void doesntExplodeOnMysteryItem() {
-        ShoppingCart sc = new ShoppingCart(new Pricer());
+    public void testTwoItems() {
+        var actual = List.of(
+            new ShoppingItem("banana", 2),
+            new ShoppingItem("apple", 1)
+        );
 
-        sc.addItem("crisps", 2);
+        cart.addItem("banana", 2);
+        cart.addItem("apple", 1);
 
-        final ByteArrayOutputStream myOut = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(myOut));
+        assertEquals(cart.toList(), actual);
+    }
 
-        sc.printReceipt();
-        assertEquals(String.format("crisps - 2 - €0.00%n"), myOut.toString());
+    @Test
+    public void testItemUpdated() {
+        var actual = List.of(
+                new ShoppingItem("banana", 5)
+        );
+
+        cart.addItem("banana", 2);
+        cart.addItem("banana", 3);
+
+        assertEquals(cart.toList(), actual);
+    }
+
+    /**
+     * NB! this test is dependent on the implementation of DefaultPrinter.
+     */
+   @Test
+    public void testOneItemPrinting() {
+        cart.addItem("banana", 5);
+
+        cart.printReceipt();
+
+        String actual =
+                "banana — 5 — €10.00\n" +
+                "TOTAL: €10.00\n";
+
+        assertEquals(output.toString(),
+                actual);
+    }
+
+    /**
+     * NB! this test is dependent on the implementation of DefaultPrinter.
+     */
+    @Test
+    public void testFreeItem() {
+        cart.addItem("Chocolate", 5);
+
+        cart.printReceipt();
+
+        String actual =
+                "Chocolate — 5 — €0.00\n" +
+                "TOTAL: €0.00\n";
+
+        assertEquals(output.toString(),
+                actual);
+    }
+    /**
+     * NB! this test is dependent on the implementation of DefaultPrinter.
+     */
+    @Test
+    public void testCombinationOfItems() {
+        cart.addItem("Chocolate", 1);
+        cart.addItem("banana", 10);
+        cart.addItem("apple", 5);
+
+        cart.printReceipt();
+
+        String actual =
+                "Chocolate — 1 — €0.00\n" +
+                "banana — 10 — €20.00\n" +
+                "apple — 5 — €5.00\n" +
+                "TOTAL: €25.00\n";
+
+        assertEquals(output.toString(),
+                actual);
     }
 }
 
