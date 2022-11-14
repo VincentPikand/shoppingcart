@@ -17,7 +17,7 @@ a separate class makes perfect sense.
 
 ### Constructor
 I've added a printer object to the ShoppingCart class, which
-determines how the check will be printed. This enables easy refactoring/changes
+determines how the receipt will be printed. This enables easy refactoring/changes
 in the future.
 
 ### Keeping track of items

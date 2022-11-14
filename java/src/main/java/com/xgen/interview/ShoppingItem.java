@@ -34,8 +34,4 @@ public class ShoppingItem {
         ShoppingItem that = (ShoppingItem) o;
         return amount == that.amount && Objects.equals(name, that.name);
     }
-    @Override
-    public int hashCode() {
-        return Objects.hash(name);
-    }
 }

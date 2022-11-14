@@ -46,7 +46,7 @@ public class ShoppingCart implements IShoppingCart {
         for(var item : contents.values()) {
             int pricePerItem = pricer.getPrice(item.getName());
             total += item.getAmount() * pricePerItem;
-            float price = (float) pricePerItem * item.getAmount() / 100;
+            float price = (float) pricePerItem * item.getAmount() / 100; // convert price to printing form
             String line = printer.printLine(item, price);
             System.out.println(line);
         }
