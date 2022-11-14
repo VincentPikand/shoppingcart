@@ -2,6 +2,9 @@ package com.xgen.interview;
 
 import java.util.Objects;
 
+/**
+ * a class for shopping items that are used in the cart.
+ */
 public class ShoppingItem {
     private int amount;
     private final String name;

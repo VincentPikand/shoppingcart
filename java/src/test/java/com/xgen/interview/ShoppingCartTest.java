@@ -76,6 +76,20 @@ public class ShoppingCartTest {
         assertEquals(cart.toList(), actual);
     }
 
+    @Test
+    public void testItemOrder() {
+        var actual = List.of(
+                new ShoppingItem("banana", 5),
+                new ShoppingItem("apple", 2)
+        );
+
+        cart.addItem("banana", 2);
+        cart.addItem("apple", 2);
+        cart.addItem("banana", 3);
+
+        assertEquals(cart.toList(), actual);
+    }
+
     /**
      * NB! this test is dependent on the implementation of DefaultPrinter.
      */
@@ -88,6 +102,25 @@ public class ShoppingCartTest {
         String actual =
                 "banana — 5 — €10.00\n" +
                 "TOTAL: €10.00\n";
+
+        assertEquals(output.toString(),
+                actual);
+    }
+
+    /**
+     * NB! this test is dependent on the implementation of DefaultPrinter.
+     */
+    @Test
+    public void testFloatingPointSum() {
+        cart.addItem("banana", 5);
+        cart.addItem("orange", 3);
+
+        cart.printReceipt();
+
+        String actual =
+                "banana — 5 — €10.00\n" +
+                "orange — 3 — €3.75\n" +
+                "TOTAL: €13.75\n";
 
         assertEquals(output.toString(),
                 actual);
