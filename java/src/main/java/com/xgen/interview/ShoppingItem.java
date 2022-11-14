@@ -12,7 +12,7 @@ public class ShoppingItem {
         this.name = name;
     }
 
-    public void updateAmount(int toAdd) {
+    public void addToAmount(int toAdd) {
         this.amount += toAdd;
     }
 

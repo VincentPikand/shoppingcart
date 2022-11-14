@@ -34,7 +34,7 @@ public class ShoppingCart implements IShoppingCart {
         if(number <= 0) throw new IllegalArgumentException("Item amount must be > 0.");
         if (contents.containsKey(itemType)) {
             var item = contents.get(itemType);
-            item.updateAmount(number);
+            item.addToAmount(number);
             return;
         }
         ShoppingItem item = new ShoppingItem(itemType, number);
